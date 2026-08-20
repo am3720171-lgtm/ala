@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>يا لؤتي 💗</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --burgundy:#3a0d1a;
+    --deep-rose:#7a2140;
+    --rose:#c9486b;
+    --rose-soft:#e88aa3;
+    --blush:#f7d9d3;
+    --gold:#d9b26a;
+    --cream:#fbeee7;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{
+    height:100%;
+    width:100%;
+    overflow-x:hidden;
+    font-family:'Cairo',sans-serif;
+    background:radial-gradient(ellipse at top, var(--deep-rose) 0%, var(--burgundy) 65%, #220711 100%);
+    color:var(--cream);
+  }
+  .screen{
+    position:fixed;
+    inset:0;
+    display:none;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:6vw 6vw;
+    overflow:hidden;
+  }
+  .screen.active{ display:flex; }
+
+  /* ambient floating hearts */
+  .petals{ position:fixed; inset:0; pointer-events:none; z-index:1; overflow:hidden;}
+  .petals span{
+    position:absolute;
+    bottom:-10%;
+    font-size:22px;
+    color:var(--rose-soft);
+    opacity:.55;
+    animation:floatUp linear infinite;
+    filter:drop-shadow(0 0 6px rgba(217,178,106,.35));
+  }
+  @keyframes floatUp{
+    0%{ transform:translateY(0) translateX(0) rotate(0deg); opacity:0;}
+    10%{opacity:.6;}
+    100%{ transform:translateY(-115vh) translateX(20px) rotate(340deg); opacity:0;}
+  }
+
+  h1,h2,h3{ font-family:'Aref Ruqaa', serif; font-weight:700; }
+
+  .content{ position:relative; z-index:2; max-width:640px; width:100%; }
+
+  .title-main{
+    font-size:clamp(30px,7vw,54px);
+    color:var(--cream);
+    text-shadow:0 0 18px rgba(217,178,106,.45), 0 2px 4px rgba(0,0,0,.4);
+    line-height:1.5;
+    margin-bottom:10px;
+  }
+  .sub{
+    font-family:'Cairo',sans-serif;
+    font-size:clamp(14px,3vw,18px);
+    color:var(--blush);
+    opacity:.85;
+    margin-bottom:34px;
+    letter-spacing:.3px;
+  }
+
+  .btn{
+    font-family:'Aref Ruqaa', serif;
+    font-size:22px;
+    background:linear-gradient(135deg, var(--rose), var(--deep-rose));
+    color:var(--cream);
+    border:1px solid rgba(217,178,106,.6);
+    padding:14px 40px;
+    border-radius:40px;
+    cursor:pointer;
+    box-shadow:0 6px 20px rgba(0,0,0,.35), inset 0 0 12px rgba(255,255,255,.06);
+    transition:transform .25s ease, box-shadow .25s ease;
+  }
+  .btn:hover{ transform:translateY(-3px) scale(1.03); box-shadow:0 10px 26px rgba(0,0,0,.45);}
+  .btn:active{ transform:translateY(0) scale(.98); }
+  .btn.secondary{ background:transparent; border:1px solid var(--gold); color:var(--gold); }
+
+  .heart-icon{ display:inline-block; }
+
+  /* -------- Game 1: heart hunt -------- */
+  #playArea{
+    position:relative;
+    width:min(90vw,520px);
+    height:min(60vh,420px);
+    margin:20px auto 10px;
+    border:1px dashed rgba(217,178,106,.5);
+    border-radius:24px;
+    background:rgba(255,255,255,.03);
+    overflow:hidden;
+  }
+  .heart-target{
+    position:absolute;
+    font-size:52px;
+    cursor:pointer;
+    user-select:none;
+    filter:drop-shadow(0 0 10px rgba(233,80,120,.6));
+    transition:left .35s ease, top .35s ease;
+    animation:pulse 1.1s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{transform:scale(1);} 50%{transform:scale(1.12);} }
+  .poem-box{
+    margin-top:16px;
+    min-height:54px;
+    font-family:'Aref Ruqaa', serif;
+    font-size:19px;
+    color:var(--gold);
+    opacity:0;
+    transition:opacity .5s ease;
+  }
+  .poem-box.show{ opacity:1; }
+  .attempts{ font-size:13px; color:var(--blush); opacity:.7; margin-top:6px;}
+
+  /* -------- photo frame -------- */
+  .frame-portrait{
+    display:inline-block;
+    padding:14px;
+    background:linear-gradient(160deg, var(--gold), #a97c3f);
+    border-radius:10px;
+    box-shadow:0 12px 34px rgba(0,0,0,.5);
+    margin-bottom:26px;
+  }
+  .frame-portrait img{
+    display:block;
+    width:min(64vw,300px);
+    height:auto;
+    max-height:60vh;
+    object-fit:cover;
+    border-radius:4px;
+    border:2px solid var(--cream);
+  }
+  .frame-auto{
+    display:inline-flex;
+    padding:12px;
+    background:linear-gradient(160deg, var(--gold), #a97c3f);
+    border-radius:10px;
+    box-shadow:0 12px 34px rgba(0,0,0,.5);
+  }
+  .frame-auto img{
+    display:block;
+    max-width:min(84vw,420px);
+    max-height:52vh;
+    width:auto;
+    height:auto;
+    border-radius:4px;
+    border:2px solid var(--cream);
+  }
+
+  .answers{ display:flex; gap:16px; flex-wrap:wrap; justify-content:center; margin-top:18px;}
+
+  /* -------- password page -------- */
+  .pass-input{
+    font-family:'Cairo',sans-serif;
+    font-size:20px;
+    padding:12px 18px;
+    border-radius:30px;
+    border:1px solid var(--gold);
+    background:rgba(255,255,255,.07);
+    color:var(--cream);
+    text-align:center;
+    width:min(80vw,260px);
+    outline:none;
+    letter-spacing:2px;
+  }
+  .pass-input::placeholder{ color:rgba(251,238,231,.5); }
+  .pass-row{ display:flex; flex-direction:column; align-items:center; gap:16px; margin-top:10px;}
+
+  /* -------- cake -------- */
+  .cake-wrap{ margin:10px auto 26px; }
+  .cake{ position:relative; width:220px; margin:0 auto; }
+  .layer{ background:linear-gradient(180deg,#f3c9d6,#e88aa3); border-radius:10px; box-shadow:inset 0 -6px 10px rgba(0,0,0,.15), 0 6px 14px rgba(0,0,0,.3); border:2px solid var(--cream);}
+  .layer1{ height:52px; }
+  .layer2{ height:44px; width:86%; margin:0 auto; }
+  .layer3{ height:36px; width:70%; margin:0 auto; }
+  .candles{ display:flex; justify-content:center; gap:14px; margin-bottom:-6px; }
+  .candle{ width:6px; height:26px; background:var(--gold); border-radius:2px; position:relative;}
+  .flame{ position:absolute; top:-14px; left:50%; transform:translateX(-50%); font-size:16px; animation:flick .4s ease-in-out infinite alternate;}
+  @keyframes flick{ from{transform:translateX(-50%) scale(1);} to{transform:translateX(-50%) scale(1.2) rotate(4deg);} }
+
+  /* -------- game 2 matching -------- */
+  .g2-board{
+    display:flex; flex-direction:column; gap:22px; align-items:center; margin-top:14px; width:100%;
+  }
+  .tray{
+    display:flex; flex-wrap:wrap; gap:10px; justify-content:center;
+    max-width:520px;
+  }
+  .item{
+    width:52px; height:52px; border-radius:12px;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(217,178,106,.5);
+    display:flex; align-items:center; justify-content:center;
+    font-size:26px; cursor:pointer;
+    transition:transform .15s ease, box-shadow .15s ease;
+  }
+  .item.selected{ transform:translateY(-6px); box-shadow:0 0 0 3px var(--gold); }
+  .item.placed{ opacity:.35; cursor:default; }
+  .rect{
+    display:flex; gap:0; border:2px solid var(--gold); border-radius:16px; overflow:hidden;
+    background:rgba(255,255,255,.04);
+  }
+  .zone{
+    width:96px; min-height:96px; display:flex; flex-wrap:wrap; align-items:center; justify-content:center;
+    gap:4px; padding:6px; border-left:1px dashed rgba(217,178,106,.4);
+  }
+  .zone:first-child{ border-left:none; }
+  .zone.full{ background:rgba(233,80,120,.12); }
+
+  /* -------- game 3 lipstick -------- */
+  #g3Area{ position:relative; width:min(90vw,480px); height:min(50vh,320px); margin:14px auto; }
+  .lipstick{
+    position:absolute; font-size:56px; cursor:pointer; user-select:none;
+    transition:left .18s ease, top .18s ease;
+    filter:drop-shadow(0 0 10px rgba(233,80,120,.5));
+  }
+
+  video{ width:min(90vw,520px); border-radius:14px; box-shadow:0 12px 30px rgba(0,0,0,.5); }
+
+  /* -------- final scrolling text -------- */
+  #scrollWrap{
+    position:relative; width:min(92vw,600px); height:70vh; overflow:hidden;
+    mask-image:linear-gradient(to bottom, transparent, black 12%, black 88%, transparent);
+  }
+  #scrollText{
+    position:absolute; width:100%; top:100%;
+    font-family:'Aref Ruqaa', serif; font-size:clamp(17px,3.4vw,22px); line-height:2.1;
+    color:var(--cream);
+    animation:scrollUp 88s linear forwards;
+  }
+  @keyframes scrollUp{ from{ top:100%; } to{ top:-160%; } }
+
+  .final-love{
+    font-family:'Aref Ruqaa', serif;
+    font-size:clamp(34px,9vw,64px);
+    color:var(--gold);
+    text-shadow:0 0 30px rgba(217,178,106,.6);
+  }
+
+  .hint{ font-size:12px; color:var(--blush); opacity:.55; margin-top:26px; }
+</style>
+</head>
+<body>
+
+<div class="petals" id="petals"></div>
+
+<!-- 1: Welcome -->
+<div class="screen active" id="screen-welcome">
+  <div class="content">
+    <h1 class="title-main">أهلاً وسهلاً بيكي في قلبي<br>يا لؤتي، يا روح قلبي 💗</h1>
+    <p class="sub">في يوم مميز زيك بالظبط... تعالي عيشي المفاجأة معايا</p>
+    <button class="btn" onclick="goTo('screen-game1'); startGame1();">ادخلي عمري</button>
+  </div>
+</div>
+
+<!-- 2: Game 1 - heart hunt -->
+<div class="screen" id="screen-game1">
+  <div class="content">
+    <h2 class="title-main" style="font-size:clamp(22px,5vw,32px);">صيدي قلبي يا لؤتي 🏹</h2>
+    <p class="sub">دوسي على القلب قبل ما يهرب منك</p>
+    <div id="playArea"><div class="heart-target" id="heartTarget">❤️</div></div>
+    <div class="poem-box" id="poemBox1"></div>
+    <div class="attempts" id="attemptsText">المحاولة 1 من 3</div>
+  </div>
+</div>
+
+<!-- 3: photo question -->
+<div class="screen" id="screen-photo">
+  <div class="content">
+    <div class="frame-portrait">
+      <img src="https://e.top4top.io/p_3884qu2lt0.jpg" alt="صورة">
+    </div>
+    <h3 style="font-size:clamp(20px,5vw,26px); margin-bottom:16px;">حساب مين ده يا مزتي؟</h3>
+    <div class="answers">
+      <button class="btn secondary" onclick="wrongAnswer()">حسابي</button>
+      <button class="btn" onclick="rightAnswer()">حساب أحلى واحدة في العالم</button>
+    </div>
+    <div class="poem-box" id="poemBoxPhoto"></div>
+  </div>
+</div>
+
+<!-- 4: password -->
+<div class="screen" id="screen-password">
+  <div class="content">
+    <h2 class="title-main" style="font-size:clamp(22px,5vw,30px);">فيه سر صغير بينا يا لؤتي 🔐</h2>
+    <p class="sub">اكتبي الباسورد عشان تكملي...</p>
+    <div class="pass-row">
+      <input type="text" class="pass-input" id="passInput" placeholder="الباسورد">
+      <button class="btn" onclick="checkPassword()">دخول</button>
+    </div>
+    <div class="poem-box" id="poemBoxPass"></div>
+    <audio id="passAudio" src="https://a.top4top.io/m_3884xwprb0.mp3" loop></audio>
+  </div>
+</div>
+
+<!-- 5: cake -->
+<div class="screen" id="screen-cake">
+  <div class="content">
+    <div class="cake-wrap">
+      <div class="candles">
+        <div class="candle"><span class="flame">🔥</span></div>
+        <div class="candle"><span class="flame">🔥</span></div>
+        <div class="candle"><span class="flame">🔥</span></div>
+      </div>
+      <div class="cake">
+        <div class="layer layer3"></div>
+        <div class="layer layer2"></div>
+        <div class="layer layer1"></div>
+      </div>
+    </div>
+    <h2 class="title-main" style="font-size:clamp(22px,5.5vw,32px);">كل سنة وانتِ طيبة<br>يا أحلى الاء في الدنيا 🎂💗</h2>
+    <audio id="cakeAudio" src="https://c.top4top.io/m_3884ey25v0.mp3"></audio>
+  </div>
+</div>
+
+<!-- 6: matching game -->
+<div class="screen" id="screen-game2">
+  <div class="content" style="max-width:560px;">
+    <h2 class="title-main" style="font-size:clamp(20px,5vw,28px);">ليكي يا نور عيني 🥕🧀🧶</h2>
+    <p class="sub">جمّعي كل ٣ حاجات من نفس النوع مع بعض في المستطيل</p>
+    <div class="g2-board">
+      <div class="tray" id="g2Tray"></div>
+      <div class="rect">
+        <div class="zone" id="zone1" data-type=""></div>
+        <div class="zone" id="zone2" data-type=""></div>
+        <div class="zone" id="zone3" data-type=""></div>
+      </div>
+    </div>
+    <div class="poem-box" id="poemBoxG2"></div>
+    <audio id="g2Audio" src="https://c.top4top.io/m_3884cidkk0.mp3"></audio>
+  </div>
+</div>
+
+<!-- 7: lipstick game -->
+<div class="screen" id="screen-game3">
+  <div class="content">
+    <h2 class="title-main" style="font-size:clamp(20px,5vw,28px);" id="g3Title">امسكي صباع الروج يا لؤتي 💄</h2>
+    <div id="g3Area"><div class="lipstick" id="lipstick">💄</div></div>
+    <div class="poem-box show" id="poemBoxG3"></div>
+    <button class="btn" id="g3RetryBtn" style="display:none;" onclick="retryLipstick()">معلش يا لؤتي يا حبيبتي حاولي آخر مرة</button>
+    <button class="btn" id="g3RewardBtn" style="display:none;" onclick="showReward()">استلام المكافأة</button>
+  </div>
+</div>
+
+<!-- 8: video reward -->
+<div class="screen" id="screen-video">
+  <div class="content">
+    <video id="rewardVideo" src="https://l.top4top.io/m_3884tao9f0.mp4" controls autoplay></video>
+  </div>
+</div>
+
+<!-- 9: final scrolling letter -->
+<div class="screen" id="screen-letter">
+  <div class="content">
+    <div class="frame-auto" style="margin-bottom:18px;">
+      <img id="finalImg" src="https://d.top4top.io/p_3884wr1w10.png" alt="صورة">
+    </div>
+    <div id="scrollWrap">
+      <div id="scrollText">
+        الاء أختي وحبيبتي وصحبي وأمي وكل حاجة حلوة في الدنيا دي...<br><br>
+        أنا مبسوط أوي، وأنا النهاردة في عيد ميلادك، وده أول عيد ميلاد أحضره معاكي،<br>
+        وهيبقى أعظم وأجمل عيد ميلاد إن شاء الله.<br><br>
+        أنا مبسوط أوي وأنا بشوفك بتكبري قدامي، وكمان هتبسط أكتر لما تسعي وتعمدي<br>
+        إنك تبدأي تاخدي خطوة صح وتنجحي قدام، وتبقي بنوتة عظيمة في أي مجال إنتي بتحبيه.<br><br>
+        أما عن نفسي، فأنا بحب ومبسوط أوي بكل لحظة بنقضيها سوا، ونفسي ربنا يديمك في حياتي<br>
+        ومحرمنيش منك أبدًا يا أعز ما أملك.<br><br>
+        وأتمنى إننا منتفرقش عن بعض أبدًا، وإن حياتك تبقى مليانة بكل خير وراحة.<br><br>
+        سنة جديدة ليكي وإنتي لسه حلوة وزي القمر، وحلاوتك بتزيد يوم عن يوم يا لؤتي 💗
+      </div>
+    </div>
+    <audio id="letterAudio" src="https://f.top4top.io/m_3884yuli20.mp3"></audio>
+  </div>
+</div>
+
+<!-- 10: final -->
+<div class="screen" id="screen-final">
+  <div class="content">
+    <div class="final-love">بحبك يا لؤتي 🌚❤</div>
+  </div>
+</div>
+
+<script>
+/* ---------- ambient hearts ---------- */
+(function(){
+  const wrap = document.getElementById('petals');
+  const icons = ['❤️','💗','🌹','💫'];
+  for(let i=0;i<16;i++){
+    const s = document.createElement('span');
+    s.textContent = icons[Math.floor(Math.random()*icons.length)];
+    s.style.left = Math.random()*100+'%';
+    s.style.fontSize = (14+Math.random()*18)+'px';
+    s.style.animationDuration = (9+Math.random()*10)+'s';
+    s.style.animationDelay = (Math.random()*10)+'s';
+    wrap.appendChild(s);
+  }
+})();
+
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ---------- Game 1: heart hunt ---------- */
+let heartAttempts = 0;
+const missPoems = [
+  'ركّزي يا لؤتي... السهم طاش والقلب راوغ، جربي تاني وهيرجعلك كل معاني الشوق 🌹',
+  'قلبي شاطر في الهروب يا لؤتي، بس خدي بالك المرة الجاية مفيش هروب تاني 💫'
+];
+function startGame1(){
+  heartAttempts = 0;
+  document.getElementById('attemptsText').textContent = 'المحاولة 1 من 3';
+  document.getElementById('poemBox1').classList.remove('show');
+  placeHeartRandom();
+}
+function placeHeartRandom(){
+  const area = document.getElementById('playArea');
+  const heart = document.getElementById('heartTarget');
+  const w = area.clientWidth, h = area.clientHeight;
+  const x = Math.random()*(w-60);
+  const y = Math.random()*(h-60);
+  heart.style.left = x+'px';
+  heart.style.top = y+'px';
+}
+document.getElementById('heartTarget').addEventListener('click', function(e){
+  e.stopPropagation();
+  heartAttempts++;
+  const poemBox = document.getElementById('poemBox1');
+  if(heartAttempts < 3){
+    poemBox.textContent = missPoems[heartAttempts-1];
+    poemBox.classList.add('show');
+    document.getElementById('attemptsText').textContent = 'المحاولة '+(heartAttempts+1)+' من 3';
+    placeHeartRandom();
+  } else {
+    document.getElementById('heartTarget').style.pointerEvents='none';
+    poemBox.textContent = 'مبروك يا عمري، طول عمرك خاطفة قلبي وعقلي وروحي كمان 💗';
+    poemBox.classList.add('show');
+    document.getElementById('attemptsText').textContent = '';
+    setTimeout(()=>{ goTo('screen-photo'); }, 4000);
+  }
+});
+
+/* ---------- photo question ---------- */
+function wrongAnswer(){
+  const b = document.getElementById('poemBoxPhoto');
+  b.textContent = 'غلط يا لؤتي! وكده هبدأ أتعصب... فكري تاني يا مغروره 😅';
+  b.classList.add('show');
+}
+function rightAnswer(){
+  const b = document.getElementById('poemBoxPhoto');
+  b.textContent = 'بعشقك يا مغروره 💗';
+  b.classList.add('show');
+  setTimeout(()=>{
+    goTo('screen-password');
+    const a = document.getElementById('passAudio');
+    a.currentTime = 0;
+    a.play().catch(()=>{});
+  }, 1400);
+}
+
+/* ---------- password ---------- */
+function checkPassword(){
+  const raw = document.getElementById('passInput').value.trim();
+  const v = raw.replace(/[\s\/\-\\]/g,'');
+  const b = document.getElementById('poemBoxPass');
+  if(v === '278' || v === '2708' || v === '0278'){
+    document.getElementById('passAudio').pause();
+    goTo('screen-cake');
+    const cakeAudio = document.getElementById('cakeAudio');
+    cakeAudio.currentTime = 0;
+    cakeAudio.play().catch(()=>{});
+    setTimeout(()=>{
+      cakeAudio.pause();
+      goTo('screen-game2');
+      startGame2();
+    }, 15000);
+  } else {
+    b.textContent = 'غلط كده يا لوء يا حبيبتي، جربي تاني وفكري كويس 🌷';
+    b.classList.add('show');
+  }
+}
+document.getElementById('passInput').addEventListener('keydown', function(e){
+  if(e.key === 'Enter'){ checkPassword(); }
+});
+
+/* ---------- Game 2: matching ---------- */
+let g2Selected = null;
+function startGame2(){
+  const tray = document.getElementById('g2Tray');
+  tray.innerHTML = '';
+  ['zone1','zone2','zone3'].forEach(z=>{
+    document.getElementById(z).dataset.type = '';
+    document.getElementById(z).innerHTML = '';
+    document.getElementById(z).classList.remove('full');
+  });
+  document.getElementById('poemBoxG2').classList.remove('show');
+  const items = [
+    {t:'carrot', e:'🥕'}, {t:'carrot', e:'🥕'}, {t:'carrot', e:'🥕'},
+    {t:'cotton', e:'☁️'}, {t:'cotton', e:'☁️'}, {t:'cotton', e:'☁️'},
+    {t:'cheese', e:'🧀'}, {t:'cheese', e:'🧀'}, {t:'cheese', e:'🧀'},
+  ];
+  items.sort(()=>Math.random()-0.5);
+  items.forEach((it,idx)=>{
+    const d = document.createElement('div');
+    d.className = 'item';
+    d.textContent = it.e;
+    d.dataset.type = it.t;
+    d.dataset.idx = idx;
+    d.addEventListener('click', ()=>selectItem(d));
+    tray.appendChild(d);
+  });
+  g2Selected = null;
+  const a = document.getElementById('g2Audio');
+  a.currentTime = 62;
+  a.play().catch(()=>{});
+  ['zone1','zone2','zone3'].forEach(z=>{
+    document.getElementById(z).onclick = ()=>placeInZone(z);
+  });
+}
+function selectItem(el){
+  if(el.classList.contains('placed')) return;
+  document.querySelectorAll('.item').forEach(i=>i.classList.remove('selected'));
+  el.classList.add('selected');
+  g2Selected = el;
+}
+function placeInZone(zoneId){
+  if(!g2Selected) return;
+  const zone = document.getElementById(zoneId);
+  const zType = zone.dataset.type;
+  const iType = g2Selected.dataset.type;
+  const count = zone.children.length;
+  if(zType && zType !== iType) {
+    const box = document.getElementById('poemBoxG2');
+    box.textContent = 'ده مش مكانه يا لؤتي، حاولي تاني 🌸';
+    box.classList.add('show');
+    return;
+  }
+  if(count >= 3) return;
+  zone.dataset.type = iType;
+  const clone = document.createElement('span');
+  clone.textContent = g2Selected.textContent;
+  clone.style.fontSize = '22px';
+  zone.appendChild(clone);
+  g2Selected.classList.add('placed');
+  g2Selected.classList.remove('selected');
+  g2Selected = null;
+  if(zone.children.length === 3){
+    zone.classList.add('full');
+  }
+  checkGame2Win();
+}
+function checkGame2Win(){
+  const zones = ['zone1','zone2','zone3'].map(z=>document.getElementById(z));
+  const allFull = zones.every(z=>z.children.length === 3);
+  if(allFull){
+    document.getElementById('g2Audio').pause();
+    setTimeout(()=>{
+      goTo('screen-game3');
+      startGame3();
+    }, 1000);
+  }
+}
+
+/* ---------- Game 3: lipstick ---------- */
+let g3Phase = 'evade';
+let g3Interval = null;
+function startGame3(){
+  g3Phase = 'evade';
+  document.getElementById('g3Title').textContent = 'امسكي صباع الروج يا لؤتي 💄';
+  document.getElementById('poemBoxG3').textContent = '';
+  document.getElementById('g3RetryBtn').style.display = 'none';
+  document.getElementById('g3RewardBtn').style.display = 'none';
+  moveLipstickRandom();
+  const lip = document.getElementById('lipstick');
+  lip.onmouseenter = evadeLipstick;
+  lip.onclick = evadeLipstick;
+  g3Interval = setInterval(()=>{ if(g3Phase==='evade') moveLipstickRandom(); }, 700);
+  setTimeout(()=>{
+    if(g3Phase === 'evade'){
+      clearInterval(g3Interval);
+      g3Phase = 'failed';
+      document.getElementById('g3Title').textContent = 'ازاي تخدعي طفلة كبيرة وهبلة بتحب المكياج 😂';
+      document.getElementById('g3RetryBtn').style.display = 'inline-block';
+      const lip2 = document.getElementById('lipstick');
+      lip2.style.display = 'none';
+    }
+  }, 5000);
+}
+function moveLipstickRandom(){
+  const area = document.getElementById('g3Area');
+  const lip = document.getElementById('lipstick');
+  const w = area.clientWidth, h = area.clientHeight;
+  const x = Math.random()*(w-60);
+  const y = Math.random()*(h-60);
+  lip.style.left = x+'px';
+  lip.style.top = y+'px';
+}
+function evadeLipstick(){
+  if(g3Phase !== 'evade') return;
+  moveLipstickRandom();
+}
+function retryLipstick(){
+  document.getElementById('g3RetryBtn').style.display = 'none';
+  document.getElementById('g3Title').textContent = 'يلا يا لؤتي، امسكيه دلوقتي 💄';
+  const lip = document.getElementById('lipstick');
+  lip.style.display = 'block';
+  lip.style.left = '50%';
+  lip.style.top = '50%';
+  lip.style.transform = 'translate(-50%,-50%)';
+  g3Phase = 'catchable';
+  lip.onclick = function(){
+    if(g3Phase !== 'catchable') return;
+    g3Phase = 'done';
+    document.getElementById('g3Title').textContent = 'برااافو يا لؤتي! 💄💗';
+    document.getElementById('g3RewardBtn').style.display = 'inline-block';
+  };
+}
+function showReward(){
+  goTo('screen-video');
+  const v = document.getElementById('rewardVideo');
+  v.currentTime = 0;
+  v.play().catch(()=>{});
+  v.onended = function(){
+    goTo('screen-letter');
+    const a = document.getElementById('letterAudio');
+    a.currentTime = 15;
+    a.play().catch(()=>{});
+    setTimeout(()=>{
+      a.pause();
+      goTo('screen-final');
+    }, 90000);
+  };
+}
+</script>
+</body>
+</html>
